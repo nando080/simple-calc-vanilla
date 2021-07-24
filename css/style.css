@@ -136,7 +136,6 @@ main {
     margin-top: 10px;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
     cursor: pointer;
 }
 
@@ -146,16 +145,16 @@ main {
     width: 20px;
     height: 20px;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
 }
 
 .toggle-button img {
     height: 70%;
 }
 
-main, button, .theme-toggle-container {
-    transition: ease .3s;
+main, button, .theme-toggle-container, .toggle-button {
+    transition: ease .5s;
 }
 
 body.dark {
@@ -181,4 +180,5 @@ main.dark {
 
 .toggle-button.dark {
     background-color: var(--dark-background);
+    transform: translateX(calc(210% - 2.5px));
 }

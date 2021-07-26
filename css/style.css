@@ -16,7 +16,7 @@
     /* light theme colors */
     --light-background: #BEEBF1;
     --light-calc-background: #fff;
-    --light-button-background: #EFF8FF;
+    --light-button-background: #eaf6ff;
     --light-button-text: #30323E;
     --light-history-text: #a7cde9;
 
@@ -122,6 +122,10 @@ main {
     color: var(--light-button-text);
 }
 
+button {
+    user-select: none;
+}
+
 [data-value="0"] {
     grid-column-start: 1;
     grid-column-end: 3;
@@ -181,4 +185,8 @@ main.dark {
 .toggle-button.dark {
     background-color: var(--dark-background);
     transform: translateX(calc(210% - 2.5px));
+}
+
+.keyPressTransform {
+    transform: scale(.93);
 }

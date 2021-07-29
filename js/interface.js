@@ -1,23 +1,45 @@
 const darkThemeItems = document.querySelectorAll(".dark")
 const toggleButton = document.querySelector('.theme-toggle-container')
 const numberButtons = document.querySelectorAll('[data-js="number"]')
+const operationButtons = document.querySelectorAll('[data-js="operation"]')
+const valueDisplay = document.querySelector('.value-display')
 
-const numberButtonIndex = {
-    '0': 9,
-    '1': 7,
-    '2': 8,
-    '3': 9,
-    '4': 3,
-    '5': 4,
-    '6': 5,
-    '7': 5,
-    '8': 5,
-    '9': 5,
-    '.': ''
+const maxNumberOfCharactersForValueDisplayRegularSize = 10
+const defaultValueDisplayFontSize = 4.7
+
+
+//todo ações dos botões
+const buttonActions = {
+    operation : {
+        divide() {
+            console.log('oi minha gente')
+        }
+    },
+    number() {
+
+    }
+}
+
+buttonActions['operation']['divide']()
+
+const testStringValue = '0'
+
+const getActualFontSize = () => {
+    const numberOfCharacters = testStringValue.length
+    if (numberOfCharacters > 10) {
+        /* regra de tres inversamente proporcional */
+        return (maxNumberOfCharactersForValueDisplayRegularSize * defaultValueDisplayFontSize) / numberOfCharacters
+    } else {
+        return defaultValueDisplayFontSize
+    }
 }
 
 const updateValueDisplay = numberButton => {
-    console.log(numberButton.dataset.value)
+    const buttonValue = numberButton.dataset.value
+    console.log(buttonValue)
+    valueDisplay.innerHTML = ''
+    valueDisplay.style.fontSize = `${getActualFontSize()}rem`
+    valueDisplay.innerHTML = testStringValue
 }
 
 const changeTheme = () => {

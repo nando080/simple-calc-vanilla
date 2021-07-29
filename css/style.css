@@ -68,8 +68,13 @@ main {
 }
 
 .value-display {
-    font-size: 5rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    min-height: 75px;
+    font-size: 4.7rem;
     font-weight: bold;
+    background-color: #52C9DD;
 }
 
 .keyboard {

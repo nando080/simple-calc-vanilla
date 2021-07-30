@@ -12,20 +12,37 @@ const defaultValueDisplayFontSize = 4.7
 const buttonActions = {
     operation : {
         divide() {
-            console.log('oi minha gente')
+        },
+        multiplay() {
+
+        },
+        subtract() {
+
+        },
+        sum() {
+
+        },
+        dot() {
+
+        },
+        equals() {
+
+        },
+        clear() {
+
         }
     },
-    number() {
+
+    number(value) {
 
     }
 }
 
-buttonActions['operation']['divide']()
-
-const testStringValue = '0'
+/* buttonActions['operation']['divide']() */
 
 const getActualFontSize = () => {
-    const numberOfCharacters = testStringValue.length
+    const actualStringValue = getStringValue()
+    const numberOfCharacters = actualStringValue.length
     if (numberOfCharacters > 10) {
         /* regra de tres inversamente proporcional */
         return (maxNumberOfCharactersForValueDisplayRegularSize * defaultValueDisplayFontSize) / numberOfCharacters
@@ -34,12 +51,16 @@ const getActualFontSize = () => {
     }
 }
 
-const updateValueDisplay = numberButton => {
-    const buttonValue = numberButton.dataset.value
-    console.log(buttonValue)
-    valueDisplay.innerHTML = ''
+//todo fazer método funcionar corretamente
+const renderValueDisplay = () => {
     valueDisplay.style.fontSize = `${getActualFontSize()}rem`
-    valueDisplay.innerHTML = testStringValue
+    valueDisplay.innerHTML = getStringValue()
+}
+
+const updateStringDisplayValue = value => {
+    const actualValue = getStringValue()
+    const newValue = `${actualValue}${value}`
+    setStringValue(newValue)
 }
 
 const changeTheme = () => {
@@ -60,7 +81,7 @@ toggleButton.addEventListener('click', changeTheme)
 
 numberButtons.forEach(button => {
     button.addEventListener('click', () => {
-        updateValueDisplay(button)
+        updateStringDisplayValue(button)
     })
 })
 
@@ -68,43 +89,43 @@ window.addEventListener('keypress', event => {
     const index = event.key
     switch (index) {
         case '0': 
-            updateValueDisplay(numberButtons[9])
+            updateStringDisplayValue(numberButtons[9])
             animatePressedKeyButton(numberButtons[9])
         break
         case '1': 
-            updateValueDisplay(numberButtons[6])
+            updateStringDisplayValue(numberButtons[6])
             animatePressedKeyButton(numberButtons[6])
         break
         case '2': 
-            updateValueDisplay(numberButtons[7])
+            updateStringDisplayValue(numberButtons[7])
             animatePressedKeyButton(numberButtons[7])
         break
         case '3': 
-            updateValueDisplay(numberButtons[8])
+            updateStringDisplayValue(numberButtons[8])
             animatePressedKeyButton(numberButtons[8])
         break
         case '4': 
-            updateValueDisplay(numberButtons[3])
+            updateStringDisplayValue(numberButtons[3])
             animatePressedKeyButton(numberButtons[3])
         break
         case '5': 
-            updateValueDisplay(numberButtons[4])
+            updateStringDisplayValue(numberButtons[4])
             animatePressedKeyButton(numberButtons[4])
         break
         case '6': 
-            updateValueDisplay(numberButtons[5])
+            updateStringDisplayValue(numberButtons[5])
             animatePressedKeyButton(numberButtons[5])
         break
         case '7': 
-            updateValueDisplay(numberButtons[0])
+            updateStringDisplayValue(numberButtons[0])
             animatePressedKeyButton(numberButtons[0])
         break
         case '8': 
-            updateValueDisplay(numberButtons[1])
+            updateStringDisplayValue(numberButtons[1])
             animatePressedKeyButton(numberButtons[1])
         break
         case '9': 
-            updateValueDisplay(numberButtons[2])
+            updateStringDisplayValue(numberButtons[2])
             animatePressedKeyButton(numberButtons[2])
         break
         case '.': console.log('ponto')
@@ -121,3 +142,6 @@ window.addEventListener('keypress', event => {
         break
     }
 })
+
+updateStringDisplayValue('8')
+renderValueDisplay()

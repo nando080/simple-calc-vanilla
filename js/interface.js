@@ -34,7 +34,16 @@ const buttonActions = {
     },
 
     number(value) {
-
+        if (value === "0") {
+            const isActualStringValueEqualsZero = getStringValue() === "0"
+            if (!isActualStringValueEqualsZero) {
+                updateStringDisplayValue(value)
+                renderValueDisplay()
+            }
+        } else {
+            updateStringDisplayValue(value)
+            renderValueDisplay()
+        }
     }
 }
 
@@ -59,7 +68,13 @@ const renderValueDisplay = () => {
 
 const updateStringDisplayValue = value => {
     const actualValue = getStringValue()
-    const newValue = `${actualValue}${value}`
+    const isDisplayValueEqualsZero = actualValue === "0"
+    let newValue = "0"
+    if (!isDisplayValueEqualsZero) {
+        newValue = `${actualValue}${value}`
+    } else {
+        newValue = value
+    }
     setStringValue(newValue)
 }
 
@@ -81,7 +96,7 @@ toggleButton.addEventListener('click', changeTheme)
 
 numberButtons.forEach(button => {
     button.addEventListener('click', () => {
-        updateStringDisplayValue(button)
+        buttonActions[button.dataset.js](button.dataset.value)
     })
 })
 
@@ -143,5 +158,4 @@ window.addEventListener('keypress', event => {
     }
 })
 
-updateStringDisplayValue('8')
 renderValueDisplay()

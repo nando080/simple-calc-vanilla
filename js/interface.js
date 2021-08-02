@@ -3,14 +3,18 @@ const toggleButton = document.querySelector('.theme-toggle-container')
 const numberButtons = document.querySelectorAll('[data-js="number"]')
 const operationButtons = document.querySelectorAll('[data-js="operation"]')
 const valueDisplay = document.querySelector('.value-display')
+const errorAlert = document.querySelector('.error')
 
 const maxNumberOfCharactersForValueDisplayRegularSize = 10
 const defaultValueDisplayFontSize = 4.7
+const maxNumberOfCharactersOnValueDisplay = 16
+
+let isError = false
 
 
-//todo ações dos botões
+//TODO ações dos botões
 const buttonActions = {
-    operation : {
+    operation: {
         divide() {
         },
         multiplay() {
@@ -49,6 +53,24 @@ const buttonActions = {
 
 /* buttonActions['operation']['divide']() */
 
+const showError = () => {
+    errorAlert.classList.add('show-error')
+}
+
+const clearError = () => {
+    const isAnError = errorAlert.classList.contains('show-error')
+    if (isAnError) {
+        errorAlert.classList.remove('show-error')
+    }
+}
+
+const verifyNumberCharactersOnValueDisplay = () => {
+    const numberOfCharacters = getStringValue().length
+    if (numberOfCharacters >= maxNumberOfCharactersOnValueDisplay) {
+        isError = true
+    }
+}
+
 const getActualFontSize = () => {
     const actualStringValue = getStringValue()
     const numberOfCharacters = actualStringValue.length
@@ -60,22 +82,26 @@ const getActualFontSize = () => {
     }
 }
 
-//todo fazer método funcionar corretamente
 const renderValueDisplay = () => {
     valueDisplay.style.fontSize = `${getActualFontSize()}rem`
     valueDisplay.innerHTML = getStringValue()
 }
 
 const updateStringDisplayValue = value => {
-    const actualValue = getStringValue()
-    const isDisplayValueEqualsZero = actualValue === "0"
-    let newValue = "0"
-    if (!isDisplayValueEqualsZero) {
-        newValue = `${actualValue}${value}`
+    verifyNumberCharactersOnValueDisplay()
+    if (!isError) {
+        const actualValue = getStringValue()
+        const isDisplayValueEqualsZero = actualValue === "0"
+        let newValue = "0"
+        if (!isDisplayValueEqualsZero) {
+            newValue = `${actualValue}${value}`
+        } else {
+            newValue = value
+        }
+        setStringValue(newValue)
     } else {
-        newValue = value
+        showError()
     }
-    setStringValue(newValue)
 }
 
 const changeTheme = () => {
@@ -89,7 +115,7 @@ const animatePressedKeyButton = button => {
     const removeAnimateClass = setInterval(() => {
         button.classList.remove('keyPressTransform')
     },
-    400)
+        400)
 }
 
 toggleButton.addEventListener('click', changeTheme)
@@ -103,58 +129,58 @@ numberButtons.forEach(button => {
 window.addEventListener('keypress', event => {
     const index = event.key
     switch (index) {
-        case '0': 
+        case '0':
             updateStringDisplayValue(numberButtons[9])
             animatePressedKeyButton(numberButtons[9])
-        break
-        case '1': 
+            break
+        case '1':
             updateStringDisplayValue(numberButtons[6])
             animatePressedKeyButton(numberButtons[6])
-        break
-        case '2': 
+            break
+        case '2':
             updateStringDisplayValue(numberButtons[7])
             animatePressedKeyButton(numberButtons[7])
-        break
-        case '3': 
+            break
+        case '3':
             updateStringDisplayValue(numberButtons[8])
             animatePressedKeyButton(numberButtons[8])
-        break
-        case '4': 
+            break
+        case '4':
             updateStringDisplayValue(numberButtons[3])
             animatePressedKeyButton(numberButtons[3])
-        break
-        case '5': 
+            break
+        case '5':
             updateStringDisplayValue(numberButtons[4])
             animatePressedKeyButton(numberButtons[4])
-        break
-        case '6': 
+            break
+        case '6':
             updateStringDisplayValue(numberButtons[5])
             animatePressedKeyButton(numberButtons[5])
-        break
-        case '7': 
+            break
+        case '7':
             updateStringDisplayValue(numberButtons[0])
             animatePressedKeyButton(numberButtons[0])
-        break
-        case '8': 
+            break
+        case '8':
             updateStringDisplayValue(numberButtons[1])
             animatePressedKeyButton(numberButtons[1])
-        break
-        case '9': 
+            break
+        case '9':
             updateStringDisplayValue(numberButtons[2])
             animatePressedKeyButton(numberButtons[2])
-        break
+            break
         case '.': console.log('ponto')
-        break
+            break
         case '/': console.log('barra')
-        break
+            break
         case '*': console.log('asterisco')
-        break
+            break
         case '+': console.log('mais')
-        break
+            break
         case '-': console.log('menos')
-        break
+            break
         case 'Enter': console.log('igualim que nem')
-        break
+            break
     }
 })
 

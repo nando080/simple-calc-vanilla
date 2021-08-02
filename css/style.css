@@ -47,6 +47,7 @@ main {
     border-radius: 10px;
     padding: 16px;
     background-color: var(--light-calc-background);
+    position: relative;
 }
 
 .display {
@@ -161,7 +162,7 @@ button {
     height: 70%;
 }
 
-main, button, .theme-toggle-container, .toggle-button {
+main, button, .theme-toggle-container, .toggle-button, error {
     transition: ease .5s;
 }
 
@@ -193,4 +194,18 @@ main.dark {
 
 .keyPressTransform {
     transform: scale(.93);
+}
+
+.error {
+    color: red;
+    font-weight: bold;
+    font-size: 2rem;
+    z-index: 100;
+    position: absolute;
+    top: 67px;
+    display: none;
+}
+
+.show-error {
+    display: block;
 }

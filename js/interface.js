@@ -10,8 +10,12 @@ const defaultValueDisplayFontSize = 4.7
 const maxNumberOfCharactersOnValueDisplay = 16
 
 let isError = false
+let newValue = true
 
-
+console.log(operationButtons);
+operationButtons[3].addEventListener('click', () => {
+    buttonActions.operation.sum()
+})
 //TODO ações dos botões
 const buttonActions = {
     operation: {
@@ -23,8 +27,12 @@ const buttonActions = {
         subtract() {
 
         },
+        //TODO ação de somar
         sum() {
-
+            addValueToArray()
+            updateStringDisplayValue('+')
+            renderValueDisplay()
+            console.log(calcValues.length);
         },
         dot() {
 

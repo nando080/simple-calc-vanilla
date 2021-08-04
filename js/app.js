@@ -1,19 +1,13 @@
-const calcValues = []
-const mathOperations = []
+const darkItemsEl = document.querySelectorAll('.dark')
+const changeThemeToggleEl = document.querySelector('.theme-toggle-container')
 
-let stringValue = '0'
 
-const operations = {
-    multiply: (value1, value2) => value1 * value2,
-    divide: (value1, value2) => value1 / value2,
-    sum: (value1, value2) => value1 + value2,
-    subtract: (value1, value2) => value1 - value2
+const changeInterfaceTheme = () => {
+    darkItemsEl.forEach(item => {
+        item.classList.toggle('dark')
+    })
 }
 
-const getStringValue = () => stringValue
-const setStringValue = actualValue => { stringValue = actualValue }
+changeThemeToggleEl.addEventListener('click', changeInterfaceTheme)
 
-const addValueToArray = () => {
-    const numericalValue = Number(getStringValue())
-    calcValues.push(numericalValue)
-}
+console.log(changeThemeToggleEl)

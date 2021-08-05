@@ -3,8 +3,19 @@ const changeThemeToggleEl = document.querySelector('.theme-toggle-container')
 const numberButtonsEl = document.querySelectorAll('[data-js="number"]')
 const operationButtonsEl = document.querySelectorAll('[data-js="operation"]')
 const valueDisplayEl = document.querySelector('.value-display')
+const errorDisplayEl = document.querySelector('.error')
+const dotButtonEl = document.querySelector('[data-js="dot"]')
+const clearOperationButtonEl = document.querySelector('[data-js="clear"]')
+const clearAllButtonEl = document.querySelector('[data-js="clear-all"]')
+const negativeButtonEl = document.querySelector('[data-js="negative"]')
+
+const maxCharacterNumberOnDisplay = 16
+const maxCharactersOnDefaultSize = 10
+const valueDisplayInitialSize = 4.7
 
 let isOperation = false
+let isError = false
+let historyDisplay = ''
 let displayValue = ''
 let firstValue = ''
 let secondValue = ''
@@ -29,23 +40,58 @@ const mathOperations = {
     },
 }
 
+const isDisplayValueZeroOrEmpty = () => (displayValue === '' || displayValue === '0') ? true : false
 
-//TODO
-const updateDisplayValue = value => {
-    const isDisplayValueZeroOrEmpty = displayValue === '' || displayValue === '0'
-    if (isOperation) {
-        displayValue =  `<span>${value}</span>`
-    } else {
-        if (isDisplayValueZeroOrEmpty) {
-            displayValue = value
-        } else {
-            displayValue += value
-        }
+const isDisplayValueReachedMaximumLength = () => {
+    let displayValueLength = displayValue.length
+    if (displayValue.indexOf('.') >= 0) {
+        displayValueLength--
     }
-    renderDisplayValue()
+    if (displayValue.indexOf('-') >= 0) {
+        displayValueLength--
+    }
+    return (displayValueLength >= maxCharacterNumberOnDisplay) ? true : false
+}
+
+const showError = () => {
+    errorDisplayEl.classList.add('show-error')
+    isError = true
+}
+
+const removeError = () => {
+    if (errorDisplayEl.classList.contains('show-error')) {
+        errorDisplayEl.classList.remove('show-error')
+        isError = false
+    }
+}
+
+const updateDisplayValue = value => {
+    if (!isDisplayValueReachedMaximumLength()) {
+        if (isOperation) {
+            displayValue = `<span>${value}</span>`
+        } else {
+            if (isDisplayValueZeroOrEmpty()) {
+                displayValue = value
+            } else {
+                displayValue += value
+            }
+        }
+        renderDisplayValue()
+    } else {
+        showError()
+    }
+}
+
+const fontSizeAutoAdjust = () => {
+    const displayValueLength = displayValue.length
+    if (displayValueLength > maxCharactersOnDefaultSize) {
+        const fontSize = (maxCharactersOnDefaultSize * valueDisplayInitialSize) / displayValueLength
+        valueDisplayEl.style.fontSize = `${fontSize}rem`
+    }
 }
 
 const renderDisplayValue = () => {
+    fontSizeAutoAdjust()
     if (displayValue === '') {
         valueDisplayEl.innerHTML = '0'
     } else {
@@ -59,6 +105,52 @@ const changeInterfaceTheme = () => {
     })
 }
 
+const complementaryOperations = {
+    dot: () => {
+        const displayValueHasDot = displayValue.indexOf('.') >= 0
+        if (!displayValueHasDot) {
+            if (isDisplayValueZeroOrEmpty()) {
+                updateDisplayValue('0.')
+            } else {
+                updateDisplayValue('.')
+            }
+        }
+    },
+    clear: () => {
+        displayValue = ''
+        renderDisplayValue()
+    },
+    clearAll: () => {
+        isOperation = false
+        isError = false
+        historyDisplay = ''
+        displayValue = '0'
+        firstValue = ''
+        secondValue = ''
+        actualOperation = ''
+        renderDisplayValue()
+    },
+    negative: () => {
+        const isDisplayValueNegative = displayValue.indexOf('-') >= 0
+        if (!isDisplayValueNegative) {
+            let negativeValue = ''
+            if (isDisplayValueZeroOrEmpty()) {
+                negativeValue = '-0'
+            } else {
+                negativeValue = `-${displayValue}`
+            }
+            complementaryOperations.clear()
+            updateDisplayValue(negativeValue)
+        } else {
+            const positiveValue = displayValue.replace(/-/i, '')
+            complementaryOperations.clear()
+            updateDisplayValue(positiveValue)
+
+        }
+    }
+}
+
+
 changeThemeToggleEl.addEventListener('click', changeInterfaceTheme)
 
 numberButtonsEl.forEach(numberButton => {
@@ -68,4 +160,10 @@ numberButtonsEl.forEach(numberButton => {
     })
 })
 
-console.log(valueDisplayEl)
+dotButtonEl.addEventListener('click', complementaryOperations.dot)
+
+clearOperationButtonEl.addEventListener('click', complementaryOperations.clear)
+
+clearAllButtonEl.addEventListener('click', complementaryOperations.clearAll)
+
+negativeButtonEl.addEventListener('click', complementaryOperations.negative)

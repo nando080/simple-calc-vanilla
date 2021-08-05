@@ -30,7 +30,7 @@ const mathOperations = {
         symbol: 'x',
         calc: (value1, value2) => value1 * value2
     },
-    subtraction: {
+    subtract: {
         symbol: '-',
         calc: (value1, value2) => value1 - value2
     },
@@ -65,6 +65,8 @@ const removeError = () => {
     }
 }
 
+
+//TODO: arrumar erro ao digitar operadores
 const updateDisplayValue = value => {
     if (!isDisplayValueReachedMaximumLength()) {
         if (isOperation) {
@@ -151,6 +153,43 @@ const complementaryOperations = {
 }
 
 
+//TODO consertar erro ao inserir operador com valor já na tela
+const handleOperationButtons = event => {
+    const operationType = event.target.dataset.value
+    const isActualOperationEmpty = actualOperation === ''
+    if (isDisplayValueZeroOrEmpty && isActualOperationEmpty && !isOperation) {
+        firstValue = '0'
+        actualOperation = operationType
+        isOperation = true
+        updateDisplayValue(mathOperations[operationType].symbol)
+        return
+    }
+    if (!isDisplayValueZeroOrEmpty && isActualOperationEmpty && !isOperation) {
+        firstValue = displayValue
+        actualOperation = operationType
+        isOperation = true
+        updateDisplayValue(mathOperations[operationType].symbol)
+        return
+    }
+    if (isOperation) {
+        actualOperation = operationType
+        updateDisplayValue(mathOperations[operationType].symbol)
+        return
+    }
+    if (secondValue !== '' && !isOperation) {
+        const firstNumberValue = Number(firstValue)
+        const secondNumberValue = Number(secondValue)
+        const result = mathOperations[actualOperation].calc(firstNumberValue, secondNumberValue)
+        firstValue = result.toString()
+        secondValue = ''
+        complementaryOperations.clear()
+        updateDisplayValue(firstValue)
+        actualOperation = operationType
+        isOperation = true
+        return
+    }
+}
+
 changeThemeToggleEl.addEventListener('click', changeInterfaceTheme)
 
 numberButtonsEl.forEach(numberButton => {
@@ -167,3 +206,7 @@ clearOperationButtonEl.addEventListener('click', complementaryOperations.clear)
 clearAllButtonEl.addEventListener('click', complementaryOperations.clearAll)
 
 negativeButtonEl.addEventListener('click', complementaryOperations.negative)
+
+operationButtonsEl.forEach(operationButton => {
+    operationButton.addEventListener('click', handleOperationButtons)
+})

@@ -15,11 +15,11 @@ const valueDisplayInitialSize = 4.7
 
 let isOperation = false
 let isError = false
-let historyDisplay = ''
-let displayValue = ''
-let firstValue = ''
-let secondValue = ''
-let actualOperation = ''
+let isShowingResults = false
+let historyValue = ''
+let inputValue = ''
+let resultValue = ''
+let newValue = ''
 
 const mathOperations = {
     divide: {
@@ -40,17 +40,20 @@ const mathOperations = {
     },
 }
 
-const isDisplayValueZeroOrEmpty = () => (displayValue === '' || displayValue === '0') ? true : false
+//TODO implementar função e consertar dependencias
+const isValueEmpty = value => {
+    return (value === '' || value === '0') ? true : false
+}
 
-const isDisplayValueReachedMaximumLength = () => {
-    let displayValueLength = displayValue.length
-    if (displayValue.indexOf('.') >= 0) {
-        displayValueLength--
+const isValueReachedMaximumLength = value => {
+    let valueLength = value.length
+    if (value.indexOf('.') >= 0) {
+        valueLength--
     }
-    if (displayValue.indexOf('-') >= 0) {
-        displayValueLength--
+    if (value.indexOf('-') >= 0) {
+        valueLength--
     }
-    return (displayValueLength >= maxCharacterNumberOnDisplay) ? true : false
+    return (valueLength >= maxCharacterNumberOnDisplay) ? true : false
 }
 
 const showError = () => {
@@ -65,39 +68,39 @@ const removeError = () => {
     }
 }
 
-
-//TODO: arrumar erro ao digitar operadores
-const updateDisplayValue = value => {
-    if (!isDisplayValueReachedMaximumLength()) {
-        if (isOperation) {
-            displayValue = `<span>${value}</span>`
-        } else {
-            if (isDisplayValueZeroOrEmpty()) {
-                displayValue = value
-            } else {
-                displayValue += value
-            }
-        }
-        renderDisplayValue()
-    } else {
-        showError()
-    }
-}
-
-const fontSizeAutoAdjust = () => {
-    const displayValueLength = displayValue.length
+const fontSizeAutoAdjust = value => {
+    const displayValueLength = value.length
     if (displayValueLength > maxCharactersOnDefaultSize) {
         const fontSize = (maxCharactersOnDefaultSize * valueDisplayInitialSize) / displayValueLength
         valueDisplayEl.style.fontSize = `${fontSize}rem`
     }
 }
 
-const renderDisplayValue = () => {
-    fontSizeAutoAdjust()
-    if (displayValue === '') {
-        valueDisplayEl.innerHTML = '0'
+const renderDisplayValue = (value, type = 'input') => {
+    if (!isError) {
+        fontSizeAutoAdjust(value)
+        valueDisplayEl.textContent = ''
+        valueDisplayEl.textContent = value
+        isShowingResults = type === 'result' ? true : false
+    }
+}
+
+const updateInputValue = value => {
+    const conditionToResetValue =
+        isValueEmpty(valueDisplayEl.textContent) || isValueEmpty(inputValue) || isOperation || isShowingResults
+    if (conditionToResetValue) {
+        inputValue = value
+    } else if (inputValue === '-0') {
+        inputValue = `-${value}`
     } else {
-        valueDisplayEl.innerHTML = displayValue
+        inputValue += value
+    }
+    if (!isValueReachedMaximumLength(inputValue)) {
+        renderDisplayValue(inputValue)
+        isOperation = false
+        isShowingResults = false
+    } else {
+        showError()
     }
 }
 
@@ -109,93 +112,78 @@ const changeInterfaceTheme = () => {
 
 const complementaryOperations = {
     dot: () => {
-        const displayValueHasDot = displayValue.indexOf('.') >= 0
-        if (!displayValueHasDot) {
-            if (isDisplayValueZeroOrEmpty()) {
-                updateDisplayValue('0.')
+        const inputValueHasDot = inputValue.indexOf('.') >= 0
+        if (!inputValueHasDot) {
+            if (isValueEmpty(inputValue)) {
+                updateInputValue('0.')
             } else {
-                updateDisplayValue('.')
+                updateInputValue('.')
             }
         }
     },
     clear: () => {
-        displayValue = ''
-        renderDisplayValue()
+        inputValue = '0'
+        renderDisplayValue(inputValue)
     },
     clearAll: () => {
         isOperation = false
         isError = false
-        historyDisplay = ''
-        displayValue = '0'
-        firstValue = ''
-        secondValue = ''
-        actualOperation = ''
-        renderDisplayValue()
+        isShowingResults = false
+        historyValue = ''
+        inputValue = '0'
+        resultValue = ''
+        newValue = ''
+        renderDisplayValue(inputValue)
     },
     negative: () => {
-        const isDisplayValueNegative = displayValue.indexOf('-') >= 0
-        if (!isDisplayValueNegative) {
+        const isInputValueNegative = inputValue.indexOf('-') >= 0
+        if (!isInputValueNegative) {
             let negativeValue = ''
-            if (isDisplayValueZeroOrEmpty()) {
+            if (isValueEmpty(inputValue)) {
                 negativeValue = '-0'
             } else {
-                negativeValue = `-${displayValue}`
+                negativeValue = `-${inputValue}`
             }
             complementaryOperations.clear()
-            updateDisplayValue(negativeValue)
+            updateInputValue(negativeValue)
         } else {
-            const positiveValue = displayValue.replace(/-/i, '')
+            const positiveValue = inputValue.replace(/-/i, '')
             complementaryOperations.clear()
-            updateDisplayValue(positiveValue)
-
+            updateInputValue(positiveValue)
         }
     }
 }
 
 
-//TODO consertar erro ao inserir operador com valor já na tela
-const handleOperationButtons = event => {
-    const operationType = event.target.dataset.value
-    const isActualOperationEmpty = actualOperation === ''
-    if (isDisplayValueZeroOrEmpty && isActualOperationEmpty && !isOperation) {
-        firstValue = '0'
-        actualOperation = operationType
-        isOperation = true
-        updateDisplayValue(mathOperations[operationType].symbol)
-        return
-    }
-    if (!isDisplayValueZeroOrEmpty && isActualOperationEmpty && !isOperation) {
-        firstValue = displayValue
-        actualOperation = operationType
-        isOperation = true
-        updateDisplayValue(mathOperations[operationType].symbol)
-        return
-    }
-    if (isOperation) {
-        actualOperation = operationType
-        updateDisplayValue(mathOperations[operationType].symbol)
-        return
-    }
-    if (secondValue !== '' && !isOperation) {
-        const firstNumberValue = Number(firstValue)
-        const secondNumberValue = Number(secondValue)
-        const result = mathOperations[actualOperation].calc(firstNumberValue, secondNumberValue)
-        firstValue = result.toString()
-        secondValue = ''
-        complementaryOperations.clear()
-        updateDisplayValue(firstValue)
-        actualOperation = operationType
-        isOperation = true
-        return
+//TODO implementar nova versão
+const handleOperationInput = operation => {
+    const currentValueOnDisplay = valueDisplayEl.textContent
+    if (!isOperation) {
+
     }
 }
+
+const handleNumberInput = value => {
+    updateInputValue(value)
+}
+
+
 
 changeThemeToggleEl.addEventListener('click', changeInterfaceTheme)
 
 numberButtonsEl.forEach(numberButton => {
     const buttonValue = numberButton.dataset.value
     numberButton.addEventListener('click', () => {
-        updateDisplayValue(buttonValue)
+        if (!isError) {
+            handleNumberInput(buttonValue)
+        }
+    })
+})
+
+operationButtonsEl.forEach(operationButton => {
+    const operationType = operationButton.dataset.value
+    operationButton.addEventListener('click', () => {
+        handleOperationInput(operationType)
     })
 })
 
@@ -207,6 +195,4 @@ clearAllButtonEl.addEventListener('click', complementaryOperations.clearAll)
 
 negativeButtonEl.addEventListener('click', complementaryOperations.negative)
 
-operationButtonsEl.forEach(operationButton => {
-    operationButton.addEventListener('click', handleOperationButtons)
-})
+const testando = 'essa é a minha string de testes'

@@ -68,23 +68,6 @@ const removeError = () => {
     }
 }
 
-const fontSizeAutoAdjust = value => {
-    const displayValueLength = value.length
-    if (displayValueLength > maxCharactersOnDefaultSize) {
-        const fontSize = (maxCharactersOnDefaultSize * valueDisplayInitialSize) / displayValueLength
-        valueDisplayEl.style.fontSize = `${fontSize}rem`
-    }
-}
-
-const renderDisplayValue = (value, type = 'input') => {
-    if (!isError) {
-        fontSizeAutoAdjust(value)
-        valueDisplayEl.textContent = ''
-        valueDisplayEl.textContent = value
-        isShowingResults = type === 'result' ? true : false
-    }
-}
-
 const updateInputValue = value => {
     const conditionToResetValue =
         isValueEmpty(valueDisplayEl.textContent) || isValueEmpty(inputValue) || isOperation || isShowingResults
@@ -101,6 +84,23 @@ const updateInputValue = value => {
         isShowingResults = false
     } else {
         showError()
+    }
+}
+
+const fontSizeAutoAdjust = value => {
+    const displayValueLength = value.length
+    if (displayValueLength > maxCharactersOnDefaultSize) {
+        const fontSize = (maxCharactersOnDefaultSize * valueDisplayInitialSize) / displayValueLength
+        valueDisplayEl.style.fontSize = `${fontSize}rem`
+    }
+}
+
+const renderDisplayValue = (value, type = 'input') => {
+    if (!isError) {
+        fontSizeAutoAdjust(value)
+        valueDisplayEl.textContent = ''
+        valueDisplayEl.textContent = value
+        isShowingResults = type === 'result' ? true : false
     }
 }
 

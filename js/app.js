@@ -3,6 +3,7 @@ const changeThemeToggleEl = document.querySelector('.theme-toggle-container')
 const numberButtonsEl = document.querySelectorAll('[data-js="number"]')
 const operationButtonsEl = document.querySelectorAll('[data-js="operation"]')
 const valueDisplayEl = document.querySelector('.value-display')
+const historyDisplayEl = document.querySelector('.history-display')
 const errorDisplayEl = document.querySelector('.error')
 const dotButtonEl = document.querySelector('[data-js="dot"]')
 const clearOperationButtonEl = document.querySelector('[data-js="clear"]')
@@ -40,7 +41,6 @@ const mathOperations = {
     },
 }
 
-//TODO implementar função e consertar dependencias
 const isValueEmpty = value => {
     return (value === '' || value === '0') ? true : false
 }
@@ -154,12 +154,49 @@ const complementaryOperations = {
     }
 }
 
+const renderHistoryDisplay = value => {
+    let currentValue = value.trim()
+    currentValue = currentValue.replace(/ /ig, '')
+    currentValue = currentValue.replace(/\//ig, '<span> / </span>')
+    currentValue = currentValue.replace(/x/ig, '<span> x </span>')
+    currentValue = currentValue.replace(/\+/ig, '<span> + </span>')
+    currentValue = currentValue.replace(/=/ig, '<span> = </span>')
+    currentValue = currentValue.replace(/-/ig, '<span> - </span>')
+    historyDisplayEl.innerHTML = ''
+    historyDisplayEl.innerHTML = currentValue
+    historyDisplayEl.classList.remove('initial-state')
+}
+
+const updateHistoryValue = value => {
+    let currentValue = ''
+    let updatedValue  = ''
+    if (value.indexOf('-') >= 0) {
+        updatedValue = `(${value})`
+    } else {
+        updatedValue = value
+    }
+    if (!isValueEmpty(historyDisplayEl.textContent)) {
+        currentValue = historyDisplayEl.textContent
+    }
+    let newValue = ''
+    if (isOperation && isShowingResults) {
+        newValue = currentValue.replace(/.$/, updatedValue)
+    } else {
+        newValue = `${currentValue}${updatedValue}`
+    }
+    renderHistoryDisplay(newValue)
+    console.log(updatedValue.indexOf('-'))
+}
+
 
 //TODO implementar nova versão
 const handleOperationInput = operation => {
     const currentValueOnDisplay = valueDisplayEl.textContent
-    if (!isOperation) {
-
+    if (!isOperation && isValueEmpty(resultValue)) {
+        resultValue = inputValue
+        inputValue = ''
+        updateHistoryValue(resultValue)
+        updateHistoryValue(mathOperations[operation].symbol)
     }
 }
 
@@ -194,5 +231,3 @@ clearOperationButtonEl.addEventListener('click', complementaryOperations.clear)
 clearAllButtonEl.addEventListener('click', complementaryOperations.clearAll)
 
 negativeButtonEl.addEventListener('click', complementaryOperations.negative)
-
-const testando = 'essa é a minha string de testes'

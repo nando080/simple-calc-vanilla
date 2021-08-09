@@ -68,6 +68,10 @@ main {
     color: var(--light-button-text);
 }
 
+.history-display.initial-state {
+    visibility: hidden;
+}
+
 .value-display {
     display: flex;
     justify-content: flex-end;

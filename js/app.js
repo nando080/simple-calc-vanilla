@@ -20,7 +20,7 @@ let isShowingResults = false
 let historyValue = ''
 let inputValue = ''
 let resultValue = ''
-let newValue = ''
+let currentOperation = ''
 
 const mathOperations = {
     divide: {
@@ -132,7 +132,7 @@ const complementaryOperations = {
         historyValue = ''
         inputValue = '0'
         resultValue = ''
-        newValue = ''
+        currentOperation = ''
         renderDisplayValue(inputValue)
     },
     negative: () => {
@@ -170,7 +170,7 @@ const renderHistoryDisplay = value => {
 const updateHistoryValue = value => {
     let currentValue = ''
     let updatedValue  = ''
-    if (value.indexOf('-') >= 0) {
+    if (value.indexOf('-') >= 0 && value.length > 1) {
         updatedValue = `(${value})`
     } else {
         updatedValue = value
@@ -180,23 +180,40 @@ const updateHistoryValue = value => {
     }
     let newValue = ''
     if (isOperation && isShowingResults) {
-        newValue = currentValue.replace(/.$/, updatedValue)
+        newValue = currentValue.trim().replace(/.$/, updatedValue)
     } else {
         newValue = `${currentValue}${updatedValue}`
     }
     renderHistoryDisplay(newValue)
-    console.log(updatedValue.indexOf('-'))
 }
 
-
-//TODO implementar nova versão
+//TODO arrumar quando zero é o primeiro valor
 const handleOperationInput = operation => {
-    const currentValueOnDisplay = valueDisplayEl.textContent
     if (!isOperation && isValueEmpty(resultValue)) {
         resultValue = inputValue
-        inputValue = ''
+        currentOperation = operation
         updateHistoryValue(resultValue)
         updateHistoryValue(mathOperations[operation].symbol)
+        complementaryOperations.clear()
+        renderDisplayValue(resultValue, 'result')
+        isOperation = true
+        return
+    }
+    if (isOperation) {
+        updateHistoryValue(mathOperations[operation].symbol)
+        currentOperation = operation
+        return
+    }
+    if (!isOperation && (resultValue !== '') && (inputValue !== '') && !isValueEmpty(currentOperation)) {
+        updateHistoryValue(inputValue)
+        updateHistoryValue(mathOperations[operation].symbol)
+        const value1 = Number(resultValue)
+        const value2 = Number(inputValue)
+        resultValue = mathOperations[currentOperation].calc(value1, value2)
+        currentOperation = operation
+        complementaryOperations.clear()
+        renderDisplayValue(resultValue, 'result')
+        isOperation = true
     }
 }
 

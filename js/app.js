@@ -17,6 +17,7 @@ const valueDisplayInitialSize = 4.7
 let isOperation = false
 let isError = false
 let isShowingResults = false
+let isHistoryDisplayInitialized = false
 let historyValue = ''
 let inputValue = ''
 let resultValue = ''
@@ -25,7 +26,13 @@ let currentOperation = ''
 const mathOperations = {
     divide: {
         symbol: '/',
-        calc: (value1, value2) => value1 / value2
+        calc: (value1, value2) => {
+            if (value1 === 0 || value2 === 0) {
+                return 0
+            } else {
+                return value1 / value2
+            }
+        }
     },
     multiply: {
         symbol: 'x',
@@ -41,9 +48,11 @@ const mathOperations = {
     },
 }
 
-const isValueEmpty = value => {
-    return (value === '' || value === '0') ? true : false
-}
+const isValueEmpty = value => value === '' ? true : false
+
+const isValueEqualsZero = value => value === '0' ? true : false
+
+const isValueEmptyOrEqualsZero = value => (isValueEmpty(value) || isValueEqualsZero(value)) ? true : false
 
 const isValueReachedMaximumLength = value => {
     let valueLength = value.length
@@ -68,25 +77,6 @@ const removeError = () => {
     }
 }
 
-const updateInputValue = value => {
-    const conditionToResetValue =
-        isValueEmpty(valueDisplayEl.textContent) || isValueEmpty(inputValue) || isOperation || isShowingResults
-    if (conditionToResetValue) {
-        inputValue = value
-    } else if (inputValue === '-0') {
-        inputValue = `-${value}`
-    } else {
-        inputValue += value
-    }
-    if (!isValueReachedMaximumLength(inputValue)) {
-        renderDisplayValue(inputValue)
-        isOperation = false
-        isShowingResults = false
-    } else {
-        showError()
-    }
-}
-
 const fontSizeAutoAdjust = value => {
     const displayValueLength = value.length
     if (displayValueLength > maxCharactersOnDefaultSize) {
@@ -104,17 +94,31 @@ const renderDisplayValue = (value, type = 'input') => {
     }
 }
 
-const changeInterfaceTheme = () => {
-    darkItemsEl.forEach(item => {
-        item.classList.toggle('dark')
-    })
+const updateInputValue = value => {
+
+    const conditionToReplaceValue = 
+        valueDisplayEl.textContent === '0' || (inputValue === '' || inputValue === '0') || isOperation || isShowingResults
+
+    if (conditionToReplaceValue) {
+        inputValue = value
+    } else if (inputValue === '-0') {
+        inputValue = `-${value}`
+    } else {
+        inputValue += value
+    }
+
+    if (isValueReachedMaximumLength(inputValue)) {
+        showError()
+    } else {
+        renderDisplayValue(inputValue)
+    }
 }
 
 const complementaryOperations = {
     dot: () => {
         const inputValueHasDot = inputValue.indexOf('.') >= 0
         if (!inputValueHasDot) {
-            if (isValueEmpty(inputValue)) {
+            if (inputValue === '' || inputValue === '0') {
                 updateInputValue('0.')
             } else {
                 updateInputValue('.')
@@ -129,17 +133,19 @@ const complementaryOperations = {
         isOperation = false
         isError = false
         isShowingResults = false
+        isHistoryDisplayInitialized = false
         historyValue = ''
         inputValue = '0'
         resultValue = ''
         currentOperation = ''
         renderDisplayValue(inputValue)
+        historyDisplayEl.classList.add('initial-state')
     },
     negative: () => {
         const isInputValueNegative = inputValue.indexOf('-') >= 0
         if (!isInputValueNegative) {
             let negativeValue = ''
-            if (isValueEmpty(inputValue)) {
+            if (inputValue === '' || inputValue === '0') {
                 negativeValue = '-0'
             } else {
                 negativeValue = `-${inputValue}`
@@ -168,60 +174,77 @@ const renderHistoryDisplay = value => {
 }
 
 const updateHistoryValue = value => {
-    let currentValue = ''
-    let updatedValue  = ''
-    if (value.indexOf('-') >= 0 && value.length > 1) {
-        updatedValue = `(${value})`
-    } else {
-        updatedValue = value
+    const currentHistoryDisplayValue = historyDisplayEl.textContent
+    let updatedValue = value
+    let newHistoryValue = ''
+
+    if (!isOperation) {
+        if (value.indexOf('-') === 0 && value.length > 1) {
+            updatedValue = `(${value})`
+        }
+    
+        if (!isHistoryDisplayInitialized) {
+            newHistoryValue = updatedValue
+        } else {
+            newHistoryValue = `${currentHistoryDisplayValue}${updatedValue}`
+        }
     }
-    if (!isValueEmpty(historyDisplayEl.textContent)) {
-        currentValue = historyDisplayEl.textContent
+
+    if (isOperation) {
+        newHistoryValue = currentHistoryDisplayValue.trim().replace(/.$/, updatedValue)
     }
-    let newValue = ''
-    if (isOperation && isShowingResults) {
-        newValue = currentValue.trim().replace(/.$/, updatedValue)
-    } else {
-        newValue = `${currentValue}${updatedValue}`
-    }
-    renderHistoryDisplay(newValue)
+
+    renderHistoryDisplay(newHistoryValue)
+
+    isHistoryDisplayInitialized = true
 }
 
-//TODO arrumar quando zero é o primeiro valor
+
 const handleOperationInput = operation => {
-    if (!isOperation && isValueEmpty(resultValue)) {
-        resultValue = inputValue
-        currentOperation = operation
-        updateHistoryValue(resultValue)
-        updateHistoryValue(mathOperations[operation].symbol)
-        complementaryOperations.clear()
-        renderDisplayValue(resultValue, 'result')
-        isOperation = true
-        return
-    }
     if (isOperation) {
-        updateHistoryValue(mathOperations[operation].symbol)
         currentOperation = operation
-        return
-    }
-    if (!isOperation && (resultValue !== '') && (inputValue !== '') && !isValueEmpty(currentOperation)) {
-        updateHistoryValue(inputValue)
         updateHistoryValue(mathOperations[operation].symbol)
-        const value1 = Number(resultValue)
-        const value2 = Number(inputValue)
-        resultValue = mathOperations[currentOperation].calc(value1, value2)
-        currentOperation = operation
-        complementaryOperations.clear()
-        renderDisplayValue(resultValue, 'result')
-        isOperation = true
+    } else {
+        if (resultValue === '' && inputValue === '') {
+            resultValue = '0'
+            currentOperation = operation
+            updateHistoryValue(resultValue)
+            updateHistoryValue(mathOperations[operation].symbol)
+            isOperation = true
+        } else if (resultValue === '' && inputValue !== '') {
+            resultValue = inputValue
+            //inputValue = '0'
+            currentOperation = operation
+            updateHistoryValue(resultValue)
+            updateHistoryValue(mathOperations[operation].symbol)
+            complementaryOperations.clear()
+            isOperation = true
+        } else {
+            const value1 = Number(resultValue)
+            const value2 = Number(inputValue)
+            const mathResult = mathOperations[currentOperation].calc(value1, value2)
+            resultValue = mathResult.toString()
+            updateHistoryValue(inputValue)
+            updateHistoryValue(mathOperations[operation].symbol)
+            renderDisplayValue(resultValue)
+            currentOperation = operation
+            inputValue = ''
+            isOperation = true
+            isShowingResults = true
+        }
     }
 }
 
 const handleNumberInput = value => {
     updateInputValue(value)
+    isOperation = false
 }
 
-
+const changeInterfaceTheme = () => {
+    darkItemsEl.forEach(item => {
+        item.classList.toggle('dark')
+    })
+}
 
 changeThemeToggleEl.addEventListener('click', changeInterfaceTheme)
 

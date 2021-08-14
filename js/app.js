@@ -64,7 +64,26 @@ const isValueReachedMaximumLength = value => {
     if (value.indexOf('-') >= 0) {
         valueLength--
     }
-    return (valueLength >= maxCharacterNumberOnDisplay) ? true : false
+    return (valueLength > maxCharacterNumberOnDisplay) ? true : false
+}
+
+const handleSizeOfFloatResult = value => {
+    let currentValue = ''
+    const isValueNegative = value.indexOf('-') >= 0
+    const isFloatNumber = value.indexOf('.')  >= 0
+    currentValue = isValueNegative ? value.replace('-', '') : value
+    const isValueTooBig =
+        (isFloatNumber && currentValue.length > maxCharacterNumberOnDisplay + 1) ? true : false
+    if (isValueTooBig) {
+        const separatedValue = currentValue.split('.')
+        if (separatedValue[0].length < maxCharacterNumberOnDisplay) {
+            const numbersAfterDot = maxCharacterNumberOnDisplay - separatedValue[0].length
+            const numberValue = Number(currentValue)
+            currentValue = (numberValue.toFixed(numbersAfterDot)).toString()
+        }
+    }
+    currentValue = isValueNegative ? `-${currentValue}` : currentValue
+    return currentValue
 }
 
 const showError = () => {
@@ -180,7 +199,7 @@ const complementaryOperations = {
                         const result = mathOperations[currentOperation].calc(value1, value2)
                         updateHistoryValue(inputValue)
                         updateHistoryValue('=')
-                        resultValue = result.toString()
+                        resultValue = handleSizeOfFloatResult(result.toString())
                         complementaryOperations.clear()
                         updateInputValue(resultValue)
                         isResult = true
@@ -191,7 +210,7 @@ const complementaryOperations = {
                             const result = mathOperations[currentOperation].calc(value, value)
                             isOperation = false
                             updateHistoryValue(resultValue)
-                            resultValue = result.toString()
+                            resultValue = handleSizeOfFloatResult(result.toString())
                             updateHistoryValue('=')
                             updateInputValue(resultValue)
                             isResult = true
@@ -250,7 +269,6 @@ const handleOperationInput = operation => {
         currentOperation = operation
         updateHistoryValue(mathOperations[operation].symbol)
     } else {
-        //TODO implementar quando o botão de igual já foi pressionado e a operação é ativada
         if (isResult) {
             currentOperation = operation
             renderHistoryDisplay('')
@@ -275,7 +293,7 @@ const handleOperationInput = operation => {
                 const value1 = Number(resultValue)
                 const value2 = Number(inputValue)
                 const mathResult = mathOperations[currentOperation].calc(value1, value2)
-                resultValue = mathResult.toString()
+                resultValue = handleSizeOfFloatResult(mathResult.toString())
                 updateHistoryValue(inputValue)
                 updateHistoryValue(mathOperations[operation].symbol)
                 renderDisplayValue(resultValue)

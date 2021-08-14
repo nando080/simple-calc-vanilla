@@ -9,6 +9,7 @@ const dotButtonEl = document.querySelector('[data-js="dot"]')
 const clearOperationButtonEl = document.querySelector('[data-js="clear"]')
 const clearAllButtonEl = document.querySelector('[data-js="clear-all"]')
 const negativeButtonEl = document.querySelector('[data-js="negative"]')
+const equalsButtonEl = document.querySelector('[data-js="equals"]')
 
 const maxCharacterNumberOnDisplay = 16
 const maxCharactersOnDefaultSize = 10
@@ -16,8 +17,9 @@ const valueDisplayInitialSize = 4.7
 
 let isOperation = false
 let isError = false
-let isShowingResults = false
+let isShowingOperationResults = false
 let isHistoryDisplayInitialized = false
+let isResult = false
 let historyValue = ''
 let inputValue = ''
 let resultValue = ''
@@ -90,14 +92,14 @@ const renderDisplayValue = (value, type = 'input') => {
         fontSizeAutoAdjust(value)
         valueDisplayEl.textContent = ''
         valueDisplayEl.textContent = value
-        isShowingResults = type === 'result' ? true : false
+        isShowingOperationResults = type === 'result' ? true : false
     }
 }
 
 const updateInputValue = value => {
 
-    const conditionToReplaceValue = 
-        valueDisplayEl.textContent === '0' || (inputValue === '' || inputValue === '0') || isOperation || isShowingResults
+    const conditionToReplaceValue =
+        valueDisplayEl.textContent === '0' || (inputValue === '' || inputValue === '0') || isOperation || isShowingOperationResults
 
     if (conditionToReplaceValue) {
         inputValue = value
@@ -132,14 +134,17 @@ const complementaryOperations = {
     clearAll: () => {
         isOperation = false
         isError = false
-        isShowingResults = false
+        isShowingOperationResults = false
         isHistoryDisplayInitialized = false
+        isResult = false
         historyValue = ''
-        inputValue = '0'
+        inputValue = ''
         resultValue = ''
         currentOperation = ''
-        renderDisplayValue(inputValue)
+        valueDisplayEl.style.fontSize = `${valueDisplayInitialSize}rem`
+        renderDisplayValue('0')
         historyDisplayEl.classList.add('initial-state')
+        removeError()
     },
     negative: () => {
         const isInputValueNegative = inputValue.indexOf('-') >= 0
@@ -156,6 +161,47 @@ const complementaryOperations = {
             const positiveValue = inputValue.replace(/-/i, '')
             complementaryOperations.clear()
             updateInputValue(positiveValue)
+        }
+    },
+
+    equals: () => {
+        if (!isError) {
+            if (!isResult) {
+                if (resultValue === '' && inputValue === '') {
+                    resultValue = '0'
+                    updateHistoryValue(resultValue)
+                    updateHistoryValue('=')
+                    isResult = true
+                    isShowingOperationResults = true
+                } else {
+                    if (inputValue !== '') {
+                        const value1 = Number(resultValue)
+                        const value2 = Number(inputValue)
+                        const result = mathOperations[currentOperation].calc(value1, value2)
+                        updateHistoryValue(inputValue)
+                        updateHistoryValue('=')
+                        resultValue = result.toString()
+                        complementaryOperations.clear()
+                        updateInputValue(resultValue)
+                        isResult = true
+                        isShowingOperationResults = true
+                    } else {
+                        if (isOperation) {
+                            const value = Number(resultValue)
+                            const result = mathOperations[currentOperation].calc(value, value)
+                            isOperation = false
+                            updateHistoryValue(resultValue)
+                            resultValue = result.toString()
+                            updateHistoryValue('=')
+                            updateInputValue(resultValue)
+                            isResult = true
+                            isShowingOperationResults = true
+                        }
+                    }
+                }
+            } else {
+
+            }
         }
     }
 }
@@ -182,7 +228,7 @@ const updateHistoryValue = value => {
         if (value.indexOf('-') === 0 && value.length > 1) {
             updatedValue = `(${value})`
         }
-    
+
         if (!isHistoryDisplayInitialized) {
             newHistoryValue = updatedValue
         } else {
@@ -199,38 +245,45 @@ const updateHistoryValue = value => {
     isHistoryDisplayInitialized = true
 }
 
-
 const handleOperationInput = operation => {
     if (isOperation) {
         currentOperation = operation
         updateHistoryValue(mathOperations[operation].symbol)
     } else {
-        if (resultValue === '' && inputValue === '') {
-            resultValue = '0'
+        //TODO implementar quando o botão de igual já foi pressionado e a operação é ativada
+        if (isResult) {
             currentOperation = operation
+            renderHistoryDisplay('')
             updateHistoryValue(resultValue)
             updateHistoryValue(mathOperations[operation].symbol)
-            isOperation = true
-        } else if (resultValue === '' && inputValue !== '') {
-            resultValue = inputValue
-            //inputValue = '0'
-            currentOperation = operation
-            updateHistoryValue(resultValue)
-            updateHistoryValue(mathOperations[operation].symbol)
-            complementaryOperations.clear()
-            isOperation = true
+            isResult = false
         } else {
-            const value1 = Number(resultValue)
-            const value2 = Number(inputValue)
-            const mathResult = mathOperations[currentOperation].calc(value1, value2)
-            resultValue = mathResult.toString()
-            updateHistoryValue(inputValue)
-            updateHistoryValue(mathOperations[operation].symbol)
-            renderDisplayValue(resultValue)
-            currentOperation = operation
-            inputValue = ''
-            isOperation = true
-            isShowingResults = true
+            if (resultValue === '' && inputValue === '') {
+                resultValue = '0'
+                currentOperation = operation
+                updateHistoryValue(resultValue)
+                updateHistoryValue(mathOperations[operation].symbol)
+                isOperation = true
+            } else if (resultValue === '' && inputValue !== '') {
+                resultValue = inputValue
+                currentOperation = operation
+                updateHistoryValue(resultValue)
+                updateHistoryValue(mathOperations[operation].symbol)
+                isOperation = true
+                isShowingOperationResults = true
+            } else {
+                const value1 = Number(resultValue)
+                const value2 = Number(inputValue)
+                const mathResult = mathOperations[currentOperation].calc(value1, value2)
+                resultValue = mathResult.toString()
+                updateHistoryValue(inputValue)
+                updateHistoryValue(mathOperations[operation].symbol)
+                renderDisplayValue(resultValue)
+                currentOperation = operation
+                inputValue = ''
+                isOperation = true
+                isShowingOperationResults = true
+            }
         }
     }
 }
@@ -271,3 +324,5 @@ clearOperationButtonEl.addEventListener('click', complementaryOperations.clear)
 clearAllButtonEl.addEventListener('click', complementaryOperations.clearAll)
 
 negativeButtonEl.addEventListener('click', complementaryOperations.negative)
+
+equalsButtonEl.addEventListener('click', complementaryOperations.equals)

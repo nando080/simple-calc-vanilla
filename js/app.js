@@ -70,7 +70,7 @@ const isValueReachedMaximumLength = value => {
 const handleSizeOfFloatResult = value => {
     let currentValue = ''
     const isValueNegative = value.indexOf('-') >= 0
-    const isFloatNumber = value.indexOf('.')  >= 0
+    const isFloatNumber = value.indexOf('.') >= 0
     currentValue = isValueNegative ? value.replace('-', '') : value
     const isValueTooBig =
         (isFloatNumber && currentValue.length > maxCharacterNumberOnDisplay + 1) ? true : false
@@ -194,16 +194,18 @@ const complementaryOperations = {
                     isShowingOperationResults = true
                 } else {
                     if (inputValue !== '') {
-                        const value1 = Number(resultValue)
-                        const value2 = Number(inputValue)
-                        const result = mathOperations[currentOperation].calc(value1, value2)
-                        updateHistoryValue(inputValue)
-                        updateHistoryValue('=')
-                        resultValue = handleSizeOfFloatResult(result.toString())
-                        complementaryOperations.clear()
-                        updateInputValue(resultValue)
-                        isResult = true
-                        isShowingOperationResults = true
+                        if (resultValue !== '') {
+                            const value1 = Number(resultValue)
+                            const value2 = Number(inputValue)
+                            const result = mathOperations[currentOperation].calc(value1, value2)
+                            updateHistoryValue(inputValue)
+                            updateHistoryValue('=')
+                            resultValue = handleSizeOfFloatResult(result.toString())
+                            complementaryOperations.clear()
+                            updateInputValue(resultValue)
+                            isResult = true
+                            isShowingOperationResults = true
+                        }
                     } else {
                         if (isOperation) {
                             const value = Number(resultValue)
@@ -317,6 +319,103 @@ const changeInterfaceTheme = () => {
     })
 }
 
+const animateKeyboardClickedButton = button => {
+    button.classList.add('keyPressTransform')
+    setInterval(() => {
+        if (button.classList.contains('keyPressTransform')) {
+            button.classList.remove('keyPressTransform')
+        }
+    }, 500)
+}
+
+
+//TODO definir ações do teclado
+const handlePressedKey = event => {
+    const pressedKey = event.key
+    let button
+    switch (pressedKey) {
+        case '/':
+            button = document.querySelector('[data-value="divide"]')
+            animateKeyboardClickedButton(button)
+            handleOperationInput('divide')
+            break
+        case '*':
+            button = document.querySelector('[data-value="multiply"]')
+            animateKeyboardClickedButton(button)
+            handleOperationInput('multiply')
+            break
+        case '-':
+            button = document.querySelector('[data-value="subtract"]')
+            animateKeyboardClickedButton(button)
+            handleOperationInput('subtract')
+            break
+        case '+':
+            button = document.querySelector('[data-value="sum"]')
+            animateKeyboardClickedButton(button)
+            handleOperationInput('sum')
+            break
+        case '.':
+            animateKeyboardClickedButton(dotButtonEl)
+            complementaryOperations.dot()
+            break
+        case 'Enter':
+            animateKeyboardClickedButton(equalsButtonEl)
+            complementaryOperations.equals()
+            break
+        case '0':
+            button = document.querySelector('[data-value="0"]')
+            animateKeyboardClickedButton(button)
+            handleNumberInput(pressedKey)
+            break
+        case '1':
+            button = document.querySelector('[data-value="1"]')
+            animateKeyboardClickedButton(button)
+            handleNumberInput(pressedKey)
+            break
+        case '2':
+            button = document.querySelector('[data-value="2"]')
+            animateKeyboardClickedButton(button)
+            handleNumberInput(pressedKey)
+            break
+        case '3':
+            button = document.querySelector('[data-value="3"]')
+            animateKeyboardClickedButton(button)
+            handleNumberInput(pressedKey)
+            break
+        case '4':
+            button = document.querySelector('[data-value="4"]')
+            animateKeyboardClickedButton(button)
+            handleNumberInput(pressedKey)
+            break
+        case '5':
+            button = document.querySelector('[data-value="5"]')
+            animateKeyboardClickedButton(button)
+            handleNumberInput(pressedKey)
+            break
+        case '6':
+            button = document.querySelector('[data-value="6"]')
+            animateKeyboardClickedButton(button)
+            handleNumberInput(pressedKey)
+            break
+        case '7':
+            button = document.querySelector('[data-value="7"]')
+            animateKeyboardClickedButton(button)
+            handleNumberInput(pressedKey)
+            break
+        case '8':
+            button = document.querySelector('[data-value="8"]')
+            animateKeyboardClickedButton(button)
+            handleNumberInput(pressedKey)
+            break
+        case '9':
+            button = document.querySelector('[data-value="9"]')
+            animateKeyboardClickedButton(button)
+            handleNumberInput(pressedKey)
+            break
+    }
+    console.log();
+}
+
 changeThemeToggleEl.addEventListener('click', changeInterfaceTheme)
 
 numberButtonsEl.forEach(numberButton => {
@@ -344,3 +443,5 @@ clearAllButtonEl.addEventListener('click', complementaryOperations.clearAll)
 negativeButtonEl.addEventListener('click', complementaryOperations.negative)
 
 equalsButtonEl.addEventListener('click', complementaryOperations.equals)
+
+document.addEventListener('keypress', handlePressedKey)

@@ -25,6 +25,14 @@
 
 }
 
+.u-transition-slow {
+    transition: all ease .4s;
+}
+
+.u-transition-fast {
+    transition: all ease .2s;
+}
+
 body {
     width: 100%;
     min-height: 100vh;

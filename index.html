@@ -10,13 +10,13 @@
 </head>
 <body>
 
-    <main class="calc">
-        <div class="calc__history">
-            <div class="calc__history__btn calc__history__btn--backward"><img src="img/prev.svg"></div>
-            <div class="calc__history__btn calc__history__btn--forward"><img src="img/next.svg"></div>
+    <main class="calc js-dark">
+        <div class="calc__history js-dark">
+            <div class="calc__history__btn calc__history__btn--backward js-dark"><img src="img/prev.svg"></div>
+            <div class="calc__history__btn calc__history__btn--forward js-dark"><img src="img/next.svg"></div>
             <p class="calc__content">100000028<span class="calc__content__operation"> x </span><span class="is-negate">(-188.355000000000000004848948980500)</span></p>
         </div>
-        <div class="calc__display">
+        <div class="calc__display js-dark">
             <p class="calc__display__content">000000</p>
         </div>
         <div class="calc__button-container">
@@ -28,22 +28,22 @@
             <button class="calc__button calc__button--operation" data-js="math-operation" data-value="minus">-</button>
             <button class="calc__button calc__button--operation" data-js="math-operation" data-value="sum">+</button>
             <button class="calc__button calc__button--operation" data-js="math-operation" data-value="equals">=</button>
-            <button class="calc__button calc__button--number" data-js="number" data-value="7">7</button>
-            <button class="calc__button calc__button--number" data-js="number" data-value="8">8</button>
-            <button class="calc__button calc__button--number" data-js="number" data-value="9">9</button>
-            <button class="calc__button calc__button--number" data-js="number" data-value="4">4</button>
-            <button class="calc__button calc__button--number" data-js="number" data-value="5">5</button>
-            <button class="calc__button calc__button--number" data-js="number" data-value="6">6</button>
-            <button class="calc__button calc__button--number" data-js="number" data-value="1">1</button>
-            <button class="calc__button calc__button--number" data-js="number" data-value="2">2</button>
-            <button class="calc__button calc__button--number" data-js="number" data-value="3">3</button>
-            <button class="calc__button calc__button--number" data-js="number" data-value="0">0</button>
-            <button class="calc__button calc__button--number" data-js="utility" data-value="dot">,</button>
+            <button class="calc__button calc__button--number js-dark" data-js="number" data-value="7">7</button>
+            <button class="calc__button calc__button--number js-dark" data-js="number" data-value="8">8</button>
+            <button class="calc__button calc__button--number js-dark" data-js="number" data-value="9">9</button>
+            <button class="calc__button calc__button--number js-dark" data-js="number" data-value="4">4</button>
+            <button class="calc__button calc__button--number js-dark" data-js="number" data-value="5">5</button>
+            <button class="calc__button calc__button--number js-dark" data-js="number" data-value="6">6</button>
+            <button class="calc__button calc__button--number js-dark" data-js="number" data-value="1">1</button>
+            <button class="calc__button calc__button--number js-dark" data-js="number" data-value="2">2</button>
+            <button class="calc__button calc__button--number js-dark" data-js="number" data-value="3">3</button>
+            <button class="calc__button calc__button--number js-dark" data-js="number" data-value="0">0</button>
+            <button class="calc__button calc__button--number js-dark" data-js="utility" data-value="dot">,</button>
         </div>
     </main>
 
-    <div class="theme-button__container">
-        <div class="theme-button">
+    <div class="theme-button__container is-active js-dark">
+        <div class="theme-button js-dark">
             <img src="img/dark.svg" alt="mudar tema" class="theme-button-icon">
         </div>
     </div>

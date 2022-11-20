@@ -26,11 +26,11 @@
 }
 
 .u-transition-slow {
-    transition: all ease .4s;
+    transition: all ease 1s;
 }
 
 .u-transition-fast {
-    transition: all ease .2s;
+    transition: all ease .4s;
 }
 
 body {

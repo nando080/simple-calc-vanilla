@@ -78,7 +78,7 @@ body {
     background-color: var(--light-color);
     opacity: .75;
     cursor: pointer;
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
     height: 100%;
@@ -86,6 +86,10 @@ body {
 
 .calc__history__btn.is-dark {
     background-color: var(--dark-color);
+}
+
+.calc__history__btn.is-active {
+    display: flex;
 }
 
 .calc__history__btn:hover {
@@ -104,7 +108,7 @@ body {
     right: 0;
 }
 
-.calc__content__operation {
+.calc__history__content-operation {
     color: var(--primary-color);
 }
 

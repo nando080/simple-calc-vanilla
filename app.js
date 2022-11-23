@@ -4,26 +4,27 @@ const historyDisplayEl = document.querySelector('.calc__history__content')
 const displayEl = document.querySelector('.calc__display__content')
 const keyboardEl = document.querySelector('.calc__button-container')
 
-let isError = false
+const defaultFontSize = 50
+const maxNumberOfDigitsOnDisplay = 16
 
-const keyboardOperations = {
-    number: function(value) {
+let currentDisplayValue = '0'
+let currentDisplayFontSize = defaultFontSize
+
+const getDisplayContainerSize = () => displayEl.parentNode.getBoundingClientRect().width
+
+const getDisplayContentSize = () => displayEl.scrollWidth
+
+const setDisplayFontSize = size => {
+    displayEl.style.fontSize = `${size}px`
+}
+
+const updateDisplay = () => {
+    displayEl.classList.add('is-hidden')
+    displayEl.textContent = currentDisplayValue
+    while(getDisplayContentSize() > getDisplayContainerSize()) {
+        currentDisplayFontSize -= 0.1
+        setDisplayFontSize(currentDisplayFontSize)
+        console.log(getDisplayContentSize());
     }
+    displayEl.classList.remove('is-hidden')
 }
-
-const clearCalc = () => {
-    isError = false
-}
-
-const keyboardHandle = event => {
-    const buttonType = event.target.dataset.js
-    const buttonValue = event.target.dataset.value
-    
-    if (!isError || buttonValue === 'clear') {
-        keyboardOperations[buttonType](buttonValue)
-    }
-    
-    console.log(buttonType, buttonValue);
-}
-
-keyboardEl.addEventListener('click', keyboardHandle)

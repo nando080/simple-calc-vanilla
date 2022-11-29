@@ -193,7 +193,7 @@ body {
     padding-top: 1rem;
 }
 
-[data-value="minus"] {
+[data-value="subtract"] {
     grid-column: 4;
     grid-row: 3;
     padding-top: 1rem;

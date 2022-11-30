@@ -10,14 +10,8 @@ const maxNumberOfDigitsOnDisplay = 16
 let currentDisplayFontSize = defaultFontSize
 
 let isError = false
-let currentDisplayValue = '0'
-
-const calcValue = {
-    firstValue: 0,
-    secondValue: 0,
-    result: 0,
-    stringResult: ''
-}
+let isOperation = true
+let currentDisplayValue = '150'
 
 const mathOperations = {
     divide: values => {
@@ -36,7 +30,31 @@ const mathOperations = {
     sum: values => values[0] + values[1]
 }
 
+/* const calcValues = {
+    firstValue: 0,
+    firstValueIsFilled: false,
+    secondValue: 0,
+    secondValueIsFilled: false,
+    operation: '',
+    currentValue: 1,
+    result: 0,
+    stringResult: '',
+    setValue: value => {
+        if (!calcValues.firstValueIsFilled) {
+            calcValues.firstValue = Number(value)
+            calcValues.firstValueIsFilled = true
+            return
+        }
+        calcValues.secondValue = Number(value)
+        calcValues.secondValueIsFilled = true
+    },
+    setOperation: operation => {
+        calcValues.operation = operation
+    }
+} */
+
 const displayValueProperties = {
+    isZero: () => currentDisplayValue === '0',
     isNegative: () => currentDisplayValue.search(/-/i) >= 0,
     isFloat: () => currentDisplayValue.search(/\./i) >= 0,
     totalSize: () => {
@@ -67,6 +85,56 @@ const displayValueProperties = {
     }
 }
 
+const utilityOperations = {
+
+    //TODO - COMPLETAR COM HISTORICO E COM O OBJETO DE VALORES
+    clear: () => {
+        currentDisplayFontSize = defaultFontSize
+        isError = false
+        isOperation = false
+        currentDisplayValue = '0'
+        displayEl.textContent = currentDisplayValue
+
+        calcValue.firstValue = 0
+        calcValue.secondValue = 0
+        calcValue.result = 0
+        calcValue.stringResult = ''
+    },
+    negate: () => {
+        const {isZero, isNegative} = displayValueProperties
+        if (!isOperation && !isZero()) {
+            if (isNegative()) {
+                currentDisplayValue = currentDisplayValue.replace(/-/i, '')
+            } else {
+                currentDisplayValue = `-${currentDisplayValue}`
+            }
+        }
+    },
+    del: () => {
+        const {isZero, totalSize} = displayValueProperties
+        if (!isOperation) {
+            if (!isZero() && totalSize() > 1) {
+                currentDisplayValue = currentDisplayValue.substring(0, currentDisplayValue.length - 1)
+                return
+            }
+            if (!isZero() && totalSize() === 1) {
+                currentDisplayValue = '0'
+                return
+            }
+        }
+    },
+    dot: () => {
+        const {isZero, isFloat, totalSize} = displayValueProperties
+        if (!isFloat() && totalSize() < maxNumberOfDigitsOnDisplay) {
+            if (isZero() || isOperation()) {
+                currentDisplayValue = '0.'
+            } else {
+                currentDisplayValue += '.'
+            }
+        }
+    }
+
+}
 
 const getDisplayContainerSize = () => displayEl.parentNode.getBoundingClientRect().width
 
@@ -95,6 +163,11 @@ const insertNumber = number => {
     updateDisplay()
 }
 
+
+//TODO - completar
+const mathOperationHandle = () => {
+}
+
 const keyboardHandle = event => {
     const keyType = event.target.dataset.js
     const keyValue = event.target.dataset.value
@@ -102,10 +175,11 @@ const keyboardHandle = event => {
     if (!isError || keyType === 'clear') {
         switch (keyType) {
             case 'utility':
-                console.log('utility');
+                utilityOperations[keyValue]()
+                updateDisplay()
                 break
             case 'math-operation':
-                console.log('operation');
+                mathOperationHandle(keyValue)
                 break
             case 'number':
                 if (displayValueProperties.totalSize() < maxNumberOfDigitsOnDisplay) {
